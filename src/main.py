@@ -122,7 +122,7 @@ def get_media(sleep_sec = 0):
         print("media info: {cnt}".format(cnt = cnt))
         cnt += 1
 
-        if(cnt > 5): break # debug
+        # if(cnt > 5): break # debug
 
     print(f"Successfully set data at get_media.")
     logger.info(f"Successfully set data at get_media.")
@@ -165,7 +165,7 @@ def get_comments(df_media, sleep_sec = 0):
             pass
         cnt += 1
 
-        if(cnt > 50): break # debug
+        # if(cnt > 50): break # debug
 
     print(f"Successfully set data at get_comment.")
     logger.info(f"Successfully set data at get_comment.")
@@ -255,7 +255,7 @@ def get_impressions(df_media, sleep_sec = 0):
         if is_media_before_get_bussiness_acount is True: break
         cnt += 1
 
-        if(cnt > 10): break # debug
+        # if(cnt > 10): break # debug
 
     df_reels = pd.DataFrame(data = reels)
     df_albums = pd.DataFrame(data = albums)
