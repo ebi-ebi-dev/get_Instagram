@@ -122,7 +122,7 @@ def get_media(sleep_sec = 0):
         print("media info: {cnt}".format(cnt = cnt))
         cnt += 1
 
-        # if(cnt > 5): break # debug
+        # if(cnt > 1): break # debug
 
     print(f"Successfully set data at get_media.")
     logger.info(f"Successfully set data at get_media.")
@@ -184,7 +184,7 @@ reels = {
 def set_data_reelvideo(endpoint, media_id, sleep_sec = 0):
     params = {
         "access_token" : config_ini['DEFAULT']['ACCESS_TOKEN'],
-        "metric": "comments,likes,plays,reach,saved,shares,total_interactions"
+        "metric": "comments,likes,views,reach,saved,shares,total_interactions"
     }
     res = requests.get(endpoint, params = params)
     time.sleep(sleep_sec)
@@ -194,18 +194,19 @@ def set_data_reelvideo(endpoint, media_id, sleep_sec = 0):
         reels["media_id"] += [media_id]
         reels["comments"] += [metrics[0]["values"][0]["value"]]
         reels["likes"] += [metrics[1]["values"][0]["value"]]
-        reels["plays"] += [metrics[2]["values"][0]["value"]]
-        reels["reach"] += [metrics[3]["values"][0]["value"]]
-        reels["saved"] += [metrics[4]["values"][0]["value"]]
-        reels["shares"] += [metrics[5]["values"][0]["value"]]
-        reels["total_interactions"] += [metrics[6]["values"][0]["value"]]
+        reels["plays"] += [None]
+        reels["reach"] += [metrics[2]["values"][0]["value"]]
+        reels["saved"] += [metrics[3]["values"][0]["value"]]
+        reels["shares"] += [metrics[4]["values"][0]["value"]]
+        reels["total_interactions"] += [metrics[5]["values"][0]["value"]]
         return False
     elif(res.status_code == 400):
-        logger.info(f"After the media id {media_id} are before get business acount: {res.text}")
-        print(f"After the media id {media_id} are before get business acount: {res.text}")
+        logger.info(f"{res.text}")
+        print(f"{res.text}")
         return True
     else:
-        raise Exception(f"Error at set_data_reels status code: {res.status_code}. {res.text}")
+        pass
+        # raise Exception(f"Error at set_data_reels status code: {res.status_code}. {res.text}")
 
 albums = {
     "media_id": [],
@@ -218,7 +219,7 @@ albums = {
 def set_data_albums(endpoint, media_id, sleep_sec = 0):
     params = {
         "access_token" : config_ini['DEFAULT']['ACCESS_TOKEN'],
-        "metric": "total_interactions,impressions,reach,saved,video_views"
+        "metric": "total_interactions,reach,saved"
     }
     res = requests.get(endpoint, params = params)
     time.sleep(sleep_sec)
@@ -226,15 +227,15 @@ def set_data_albums(endpoint, media_id, sleep_sec = 0):
         data = res.json()
         metrics = data["data"]
         albums["media_id"] += [media_id]
-        albums["engagement"] += [metrics[1]["values"][0]["value"]]
-        albums["impressions"] += [metrics[2]["values"][0]["value"]]
-        albums["reach"] += [metrics[3]["values"][0]["value"]]
-        albums["saved"] += [metrics[4]["values"][0]["value"]]
-        albums["video_views"] += [metrics[0]["values"][0]["value"]]
+        albums["engagement"] += [metrics[0]["values"][0]["value"]]
+        albums["impressions"] += [None]
+        albums["reach"] += [metrics[1]["values"][0]["value"]]
+        albums["saved"] += [metrics[2]["values"][0]["value"]]
+        albums["video_views"] += [None]
         return False
     elif(res.status_code == 400):
-        logger.info(f"After the media id {media_id} are before get business acount: {res.text}")
-        print(f"After the media id {media_id} are before get business acount: {res.text}")
+        logger.info(f"{res.text}")
+        print(f"{res.text}")
         return True
     else:
         raise Exception(f"Error at set_data_albums status code: {res.status_code}. {res.text}")
@@ -244,9 +245,10 @@ def get_impressions(df_media, sleep_sec = 0):
     is_media_before_get_bussiness_acount = False
     for media_id, media_type, media_product_type in zip(df_media["id"], df_media["media_type"], df_media["media_product_type"]):
         endpoint = BASE_URL.format(api_version = config_ini['DEFAULT']['API_VERSION'], id = media_id) + "/insights"
+        print(media_type, media_product_type)
         if(media_type == "VIDEO" and media_product_type == "REELS"):
             is_media_before_get_bussiness_acount = set_data_reelvideo(endpoint, media_id, sleep_sec)
-        elif(media_type == "CAROUSEL_ALBUM" or media_type == "IMAGE" or (media_type == "VIDEO" and media_product_type == "FEED")):
+        elif(media_type == "CAROUSEL_ALBUM" or media_type == "IMAGE"):
             is_media_before_get_bussiness_acount = set_data_albums(endpoint, media_id, sleep_sec)
         else:
             print(f"{media_id} {media_type} {media_product_type}: no target media type.")
@@ -275,7 +277,7 @@ def main():
     df_media = get_media(sleep_sec)
     df_media.to_csv(f"{csv_path}/{csv_prefix_name}media{csv_suffix_name}.csv", index=False)
 
-    get_comments(df_media, sleep_sec).to_csv(f"{csv_path}/{csv_prefix_name}comment{csv_suffix_name}.csv", index=False)
+    # get_comments(df_media, sleep_sec).to_csv(f"{csv_path}/{csv_prefix_name}comment{csv_suffix_name}.csv", index=False)
 
     df_reels, df_albums = get_impressions(df_media, sleep_sec)
     df_reels.to_csv(f"{csv_path}/{csv_prefix_name}reels{csv_suffix_name}.csv", index=False)
