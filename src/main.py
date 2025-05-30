@@ -277,7 +277,7 @@ def main():
     df_media = get_media(sleep_sec)
     df_media.to_csv(f"{csv_path}/{csv_prefix_name}media{csv_suffix_name}.csv", index=False)
 
-    # get_comments(df_media, sleep_sec).to_csv(f"{csv_path}/{csv_prefix_name}comment{csv_suffix_name}.csv", index=False)
+    get_comments(df_media, sleep_sec).to_csv(f"{csv_path}/{csv_prefix_name}comment{csv_suffix_name}.csv", index=False)
 
     df_reels, df_albums = get_impressions(df_media, sleep_sec)
     df_reels.to_csv(f"{csv_path}/{csv_prefix_name}reels{csv_suffix_name}.csv", index=False)
